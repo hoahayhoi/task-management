@@ -6,16 +6,9 @@ const port = 3000;
 const databse = require("./config/database");
 databse.connect();
 
+const routeClient = require("./routes/client/index.route");
 
-const Task = require("./models/task.model");
-
-app.get("/tasks", async (req, res) => {
-  const tasks = await Task.find({
-    deleted: false
-  });
-  res.json(tasks);
-});
-
+routeClient(app);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
