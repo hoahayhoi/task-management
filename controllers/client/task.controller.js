@@ -17,7 +17,28 @@ module.exports.index = async (req, res) => {
   }
   // End sort 
 
-  const tasks = await Task.find(find).sort(sort);
+  // Pagination 
+  let limitItem = 4; 
+  let page = 1; 
+
+  if (req.query.page) {
+    page = req.query.page;
+  }
+
+  if (req.query.limitItem) {
+    limitItem = req.query.limitItem;
+  }
+
+  const skip = (page - 1) * limitItem;
+  // End Pagination 
+
+
+  const tasks = await Task
+    .find(find)
+    .limit(limitItem)
+    .skip(skip)
+    .sort(sort);
+
   res.json(tasks);
 }
 
