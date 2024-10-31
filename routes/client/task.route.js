@@ -9,4 +9,9 @@ router.get("/detail/:id", controller.detail);
 
 router.patch("/change-multi", controller.changeMultiPatch);
 
+router.post("/createPost", controller.createPost);
+
+router.patch("/editPatch/:id", controller.editPatch);
+
+
 module.exports = router;
