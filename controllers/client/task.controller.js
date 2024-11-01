@@ -99,3 +99,18 @@ module.exports.editPatch = async (req, res) => {
     message: "Cập nhật công việc thành công!"
   });
 }
+
+module.exports.deleteMultiPatch = async (req, res) => {
+  const ids = req.body.ids;
+  
+  await Task.updateMany({
+    _id: { $in: ids }
+  }, {
+    deleted: true
+  });
+
+  res.json({
+    code: "success", 
+    message: "Xoá thành công!"
+  });
+}

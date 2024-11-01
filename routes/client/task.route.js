@@ -13,5 +13,7 @@ router.post("/createPost", controller.createPost);
 
 router.patch("/editPatch/:id", controller.editPatch);
 
+router.patch("/delete-multi", controller.deleteMultiPatch);
+
 
 module.exports = router;
