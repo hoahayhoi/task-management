@@ -13,16 +13,16 @@ module.exports.register = async (req, res) => {
 
     if (existUser) {
         res.json({
-            code: "error", 
+            code: "error",
             message: "Email đã tồn tại trong hệ thống!"
         });
         return;
     }
 
     const dateUser = {
-        fullName: user.fullName, 
-        email: user.email, 
-        password: md5(user.password), 
+        fullName: user.fullName,
+        email: user.email,
+        password: md5(user.password),
         token: generateHelper.generateRandomString(30)
     }
 
@@ -30,8 +30,39 @@ module.exports.register = async (req, res) => {
     await newUser.save();
 
     res.json({
-        code: "success", 
+        code: "success",
         message: "Đăng kí thành công!",
         token: newUser.token
     });
+}
+
+module.exports.login = async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const existUser = await User.findOne({
+        email: email,
+        deleted: false
+    });
+
+    if (!existUser) {
+        res.json({
+            code: "error",
+            message: "Email không tồn tại trong hệ thống!"
+        });
+        return;
+    }
+
+    if (md5(password) != existUser.password) {
+        res.json({
+            code: "error",
+            message: "Sai mật khẩu!"
+        });
+        return;
+    }
+
+    res.json({
+        code: "success",
+        message: "Đăng nhập thành công!",
+        token: existUser.token
+    })
 }
