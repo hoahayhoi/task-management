@@ -2,6 +2,10 @@ const Task = require("../../models/task.model");
 
 module.exports.index = async (req, res) => {
   const find = {
+    $or: [
+      { createdBy: req.user.id },
+      { listUser: req.user.id }
+    ],
     deleted: false
   }
 
@@ -12,14 +16,14 @@ module.exports.index = async (req, res) => {
   // Sort 
   const sort = {};
 
-  if(req.query.sortKey && req.query.sortValue){
+  if (req.query.sortKey && req.query.sortValue) {
     sort[req.query.sortKey] = req.query.sortValue;
   }
   // End sort 
 
   // Pagination 
-  let limitItem = 4; 
-  let page = 1; 
+  let limitItem = 4;
+  let page = 1;
 
   if (req.query.page) {
     page = req.query.page;
@@ -45,16 +49,38 @@ module.exports.index = async (req, res) => {
     .skip(skip)
     .sort(sort);
 
-  res.json(tasks);
+  res.json({
+    code: "success",
+    message: "Thành công!",
+    data: tasks
+  });
 }
 
 module.exports.detail = async (req, res) => {
   const id = req.params.id;
+
   const task = await Task.findOne({
     _id: id,
+    $or : [
+      { createdBy: req.user.id }, 
+      { listUser: req.user.id }
+    ],
     deleted: false
   });
-  res.json(task);
+
+  if(!task) {
+    res.json({
+      code: "error",
+      message: "Id không hợp lệ!"
+    });
+    return;
+  }
+
+  res.json({
+    code: "success",
+    message: "Thành công!",
+    data: task
+  });
 }
 
 module.exports.changeMultiPatch = async (req, res) => {
@@ -76,12 +102,14 @@ module.exports.changeMultiPatch = async (req, res) => {
 module.exports.createPost = async (req, res) => {
   const data = req.body;
 
+  data.createdBy = req.user.id;
+
   const task = new Task(data);
   await task.save();
 
   res.json({
-    code: "success", 
-    message: "Tạo công việc thành công!", 
+    code: "success",
+    message: "Tạo công việc thành công!",
     data: task
   });
 }
@@ -102,7 +130,7 @@ module.exports.editPatch = async (req, res) => {
 
 module.exports.deleteMultiPatch = async (req, res) => {
   const ids = req.body.ids;
-  
+
   await Task.updateMany({
     _id: { $in: ids }
   }, {
@@ -110,7 +138,7 @@ module.exports.deleteMultiPatch = async (req, res) => {
   });
 
   res.json({
-    code: "success", 
+    code: "success",
     message: "Xoá thành công!"
   });
 }
